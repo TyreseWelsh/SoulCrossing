@@ -70,8 +70,9 @@ void AMinionSoul::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 {
 	if (IPossessable* PossessableInterface = Cast<IPossessable>(OtherActor))
 	{
-		PawnsCanPossess.AddUnique(Cast<APawn>(OtherActor));
-		PawnToPossess = PawnsCanPossess[0];
+		SkeletonsCanPossess.AddUnique(Cast<ACharacter>(OtherActor));
+		SkeletonToPossess = SkeletonsCanPossess[0];
+		SkeletonToPossess->GetMesh()->SetOverlayMaterial(HighlightMaterial);
 	}
 }
 
@@ -79,16 +80,17 @@ void AMinionSoul::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 {
 	if (IPossessable* PossessableInterface = Cast<IPossessable>(OtherActor))
 	{
+		Cast<ACharacter>(OtherActor)->GetMesh()->SetOverlayMaterial(nullptr);
+		SkeletonsCanPossess.Remove(Cast<ACharacter>(OtherActor));
 
-		PawnsCanPossess.Remove(Cast<APawn>(OtherActor));
-
-		if (PawnsCanPossess.Num() > 0)
+		if (SkeletonsCanPossess.Num() > 0)
 		{
-			PawnToPossess = PawnsCanPossess[0];
+			SkeletonToPossess = SkeletonsCanPossess[0];
+			SkeletonToPossess->GetMesh()->SetOverlayMaterial(HighlightMaterial);
 		}
 		else
 		{
-			PawnToPossess = nullptr;
+			SkeletonToPossess = nullptr;
 		}
 	}
 }
@@ -148,15 +150,15 @@ void AMinionSoul::Look(const FInputActionValue& Value)
 void AMinionSoul::PossessPawn(const FInputActionValue& Value)
 {
 	// If within the collision bounds of a possessable body, call their possess function
-	if (PawnToPossess != nullptr)
+	if (SkeletonToPossess != nullptr)
 	{
-		if (IPossessable* PossessableInterface = Cast<IPossessable>(PawnToPossess))
+		if (IPossessable* PossessableInterface = Cast<IPossessable>(SkeletonToPossess))
 		{
-			if (PossessableInterface->Execute_GetSoulCost(PawnToPossess) <= SoulEnergy)			// Checking if the player has enough soul energy to possess the possessable object
+			if (PossessableInterface->Execute_GetSoulCost(SkeletonToPossess) <= SoulEnergy)			// Checking if the player has enough soul energy to possess the possessable object
 			{
-				PossessableInterface->Execute_StoreSoulEnergy(PawnToPossess, SoulEnergy);
-				PossessableInterface->Execute_PossessThis(PawnToPossess);
-				GetController()->Possess(Cast<APawn>(PawnToPossess));
+				PossessableInterface->Execute_StoreSoulEnergy(SkeletonToPossess, SoulEnergy);
+				PossessableInterface->Execute_PossessThis(SkeletonToPossess);
+				GetController()->Possess(Cast<APawn>(SkeletonToPossess));
 				Destroy();
 			}
 		}

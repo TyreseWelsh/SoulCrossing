@@ -38,6 +38,9 @@ class DUNGEONPUZZLEGAME_API AMinionSoul : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* PossessAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UMaterialInterface* HighlightMaterial;
+
 	UFUNCTION()
 	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
@@ -69,6 +72,6 @@ private:
 	void PossessPawn(const FInputActionValue& Value);
 
 	int SoulEnergy = 1;
-	APawn* PawnToPossess = nullptr;
-	TArray<APawn*> PawnsCanPossess;
+	ACharacter* SkeletonToPossess = nullptr;
+	TArray<ACharacter*> SkeletonsCanPossess;
 };
