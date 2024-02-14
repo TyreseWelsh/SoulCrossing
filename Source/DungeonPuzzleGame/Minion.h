@@ -84,4 +84,10 @@ private:
 
 	int SoulCost = 1;
 	int StoredSoulEnergy = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float BaseMoveSpeed = 600.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Possession", meta = (AllowPrivateAccess = "true"))
+	bool Possessed = false;
 };

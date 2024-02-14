@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -23,6 +24,10 @@ AMinion::AMinion()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+
+	// Speed of rotation around Yaw
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 1200.0f, 0.0f);
+	GetCharacterMovement()->MaxWalkSpeed = 0;
 
 	// Temporary static mesh to represent the player character (will be replaced with a skeletal mesh later down the line)
 	PlayerStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
@@ -92,12 +97,13 @@ void AMinion::StoreSoulEnergy_Implementation(int EnergyToStore)
 	UE_LOG(LogTemp, Error, TEXT("StoredEnergy: %i, PlayerEnergy: %i"), StoredSoulEnergy, EnergyToStore);
 }
 
-void AMinion::PossessThis_Implementation()
-{
-	// Here we will set the controller to control this or something like that and play the revive animation
+//void AMinion::PossessThis_Implementation()
+//{
+	//// Here we will set the controller to control this or something like that and play the revive animation
 	
-	UE_LOG(LogTemp, Error, TEXT("POSSESSED!"));
-}
+	//UE_LOG(LogTemp, Error, TEXT("POSSESSED!"));
+	//Possessed = true;
+//}
 
 void AMinion::Move(const FInputActionValue& Value)
 {
@@ -138,10 +144,14 @@ void AMinion::Look(const FInputActionValue& Value)
 
 void AMinion::UnPossess(const FInputActionValue& Value)
 {
-	//GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+	Possessed = false;
+	GetCharacterMovement()->Velocity = FVector(0, 0, 0);
+	GetCharacterMovement()->MaxWalkSpeed = 0;
 
 	AMinionSoul* playerSoul = GetWorld()->SpawnActor<AMinionSoul>(BP_Soul, GetActorTransform());
-	playerSoul->SetSoulEnergy(StoredSoulEnergy);
-	UE_LOG(LogTemp, Error, TEXT("Energy going back to soul: %i"), StoredSoulEnergy);
-	GetController()->Possess(playerSoul);
+	if (playerSoul != nullptr)
+	{
+		playerSoul->SetSoulEnergy(StoredSoulEnergy);
+		GetController()->Possess(playerSoul);
+	}
 }
