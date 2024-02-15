@@ -27,7 +27,9 @@ AMinion::AMinion()
 
 	// Speed of rotation around Yaw
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 1200.0f, 0.0f);
-	GetCharacterMovement()->MaxWalkSpeed = 0;
+	//GetCharacterMovement()->MaxWalkSpeed = 0;
+	GetCharacterMovement()->JumpZVelocity = 700.f;
+	GetCharacterMovement()->GravityScale = 1.2f;
 
 	// Temporary static mesh to represent the player character (will be replaced with a skeletal mesh later down the line)
 	PlayerStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
@@ -82,6 +84,9 @@ void AMinion::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMinion::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMinion::Look);
 
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+
 		EnhancedInputComponent->BindAction(UnPossessAction, ETriggerEvent::Triggered, this, &AMinion::UnPossess);
 	}
 }
@@ -107,27 +112,30 @@ void AMinion::StoreSoulEnergy_Implementation(int EnergyToStore)
 
 void AMinion::Move(const FInputActionValue& Value)
 {
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	if (GetController() != nullptr)
+	if (bCanInput)
 	{
-		const FRotator Rotation = Controller->GetControlRotation();												// Rotation of forward facing pawn
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		FVector2D MovementVector = Value.Get<FVector2D>();
 
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);					// By default unreal uses X as the forward vector so we are getting that based on the pawns Yaw rotation
+		if (GetController() != nullptr)
+		{
+			const FRotator Rotation = Controller->GetControlRotation();												// Rotation of forward facing pawn
+			const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);						// By default unreal uses Y as the right vector direction so we are also getting that
+			const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);					// By default unreal uses X as the forward vector so we are getting that based on the pawns Yaw rotation
 
-		AddMovementInput(ForwardDirection, MovementVector.Y);													// Adding input values Y value to get forward/backward movement since that is what the values translate to
-		AddMovementInput(RightDirection, MovementVector.X);														// Adding input values X value to get right/left movement ^
+			const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);						// By default unreal uses Y as the right vector direction so we are also getting that
+
+			AddMovementInput(ForwardDirection, MovementVector.Y);													// Adding input values Y value to get forward/backward movement since that is what the values translate to
+			AddMovementInput(RightDirection, MovementVector.X);														// Adding input values X value to get right/left movement ^
 
 
-		// Finds the rotator from the player meshes current relative rotation to that of the movement vector
-		// Then sets the relative rotation to the value of the lerp between the current mesh rotation and the target rotation
-		//FVector MovementVector3D(MovementVector.Y, MovementVector.X, 0);
-		//FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(PlayerStaticMesh->GetRelativeLocation(), PlayerStaticMesh->GetRelativeLocation() + MovementVector3D);
+			// Finds the rotator from the player meshes current relative rotation to that of the movement vector
+			// Then sets the relative rotation to the value of the lerp between the current mesh rotation and the target rotation
+			//FVector MovementVector3D(MovementVector.Y, MovementVector.X, 0);
+			//FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(PlayerStaticMesh->GetRelativeLocation(), PlayerStaticMesh->GetRelativeLocation() + MovementVector3D);
 
-		//PlayerStaticMesh->SetRelativeRotation(UKismetMathLibrary::RInterpTo(PlayerStaticMesh->GetRelativeRotation(), LookRotation, GetWorld()->GetDeltaSeconds(), 8));
+			//PlayerStaticMesh->SetRelativeRotation(UKismetMathLibrary::RInterpTo(PlayerStaticMesh->GetRelativeRotation(), LookRotation, GetWorld()->GetDeltaSeconds(), 8));
+		}
 	}
 }
 
@@ -144,14 +152,17 @@ void AMinion::Look(const FInputActionValue& Value)
 
 void AMinion::UnPossess(const FInputActionValue& Value)
 {
-	Possessed = false;
-	GetCharacterMovement()->Velocity = FVector(0, 0, 0);
-	GetCharacterMovement()->MaxWalkSpeed = 0;
-
-	AMinionSoul* playerSoul = GetWorld()->SpawnActor<AMinionSoul>(BP_Soul, GetActorTransform());
-	if (playerSoul != nullptr)
+	if (bCanInput)
 	{
-		playerSoul->SetSoulEnergy(StoredSoulEnergy);
-		GetController()->Possess(playerSoul);
+		Possessed = false;
+		GetCharacterMovement()->Velocity = FVector(0, 0, 0);
+		//GetCharacterMovement()->MaxWalkSpeed = 0;
+
+		AMinionSoul* playerSoul = GetWorld()->SpawnActor<AMinionSoul>(BP_Soul, GetActorTransform());
+		if (playerSoul != nullptr)
+		{
+			playerSoul->SetSoulEnergy(StoredSoulEnergy);
+			GetController()->Possess(playerSoul);
+		}
 	}
 }
