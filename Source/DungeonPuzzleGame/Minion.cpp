@@ -14,6 +14,7 @@
 
 #include "MinionSoul.h"
 
+
 // Sets default values
 AMinion::AMinion()
 {
@@ -25,17 +26,12 @@ AMinion::AMinion()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 	// Speed of rotation around Yaw
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 1200.0f, 0.0f);
-	//GetCharacterMovement()->MaxWalkSpeed = 0;
-	GetCharacterMovement()->JumpZVelocity = 700.f;
-	GetCharacterMovement()->GravityScale = 1.2f;
 
-	// Temporary static mesh to represent the player character (will be replaced with a skeletal mesh later down the line)
-	PlayerStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
-	PlayerStaticMesh->SetupAttachment(RootComponent);
-	PlayerNoseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Nose"));
-	PlayerNoseMesh->SetupAttachment(PlayerStaticMesh);
+	GetCharacterMovement()->JumpZVelocity = 700.f;
+	GetCharacterMovement()->GravityScale = 2.f;
 	
 	// Camera boom to pull/push camera away from character when it collides with a world object
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -63,14 +59,34 @@ void AMinion::BeginPlay()
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);																		// Setting this players beginning input mapping context which for most will be "Default"
 		}
+
 	}
+
+	GetMesh()->GetAnimInstance()->OnMontageBlendingOut.AddDynamic(this, &AMinion::MontageBeginBlendOut);
 }
 
 // Called every frame
 void AMinion::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
 
+void AMinion::Jump()
+{
+	if(bCanInput)
+	{
+		bPressedJump = true;
+		JumpKeyHoldTime = 0.0f;
+	}
+}
+
+void AMinion::MontageBeginBlendOut(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (Montage == PossessionMontage)
+	{
+		bCanInput = true;
+		Possessed = true;
+	}
 }
 
 // Called to bind functionality to input
@@ -84,7 +100,7 @@ void AMinion::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMinion::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMinion::Look);
 
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		JumpActionBinding = &EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		EnhancedInputComponent->BindAction(UnPossessAction, ETriggerEvent::Triggered, this, &AMinion::UnPossess);
@@ -102,13 +118,11 @@ void AMinion::StoreSoulEnergy_Implementation(int EnergyToStore)
 	UE_LOG(LogTemp, Error, TEXT("StoredEnergy: %i, PlayerEnergy: %i"), StoredSoulEnergy, EnergyToStore);
 }
 
-//void AMinion::PossessThis_Implementation()
-//{
-	//// Here we will set the controller to control this or something like that and play the revive animation
-	
-	//UE_LOG(LogTemp, Error, TEXT("POSSESSED!"));
-	//Possessed = true;
-//}
+void AMinion::PossessThis_Implementation()
+{
+	bCanInput = false;
+	PlayAnimMontage(PossessionMontage);
+}
 
 void AMinion::Move(const FInputActionValue& Value)
 {
@@ -127,14 +141,6 @@ void AMinion::Move(const FInputActionValue& Value)
 
 			AddMovementInput(ForwardDirection, MovementVector.Y);													// Adding input values Y value to get forward/backward movement since that is what the values translate to
 			AddMovementInput(RightDirection, MovementVector.X);														// Adding input values X value to get right/left movement ^
-
-
-			// Finds the rotator from the player meshes current relative rotation to that of the movement vector
-			// Then sets the relative rotation to the value of the lerp between the current mesh rotation and the target rotation
-			//FVector MovementVector3D(MovementVector.Y, MovementVector.X, 0);
-			//FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(PlayerStaticMesh->GetRelativeLocation(), PlayerStaticMesh->GetRelativeLocation() + MovementVector3D);
-
-			//PlayerStaticMesh->SetRelativeRotation(UKismetMathLibrary::RInterpTo(PlayerStaticMesh->GetRelativeRotation(), LookRotation, GetWorld()->GetDeltaSeconds(), 8));
 		}
 	}
 }
@@ -152,11 +158,10 @@ void AMinion::Look(const FInputActionValue& Value)
 
 void AMinion::UnPossess(const FInputActionValue& Value)
 {
-	if (bCanInput)
+	if (bCanInput && GetCharacterMovement()->Velocity.Z == 0)
 	{
 		Possessed = false;
 		GetCharacterMovement()->Velocity = FVector(0, 0, 0);
-		//GetCharacterMovement()->MaxWalkSpeed = 0;
 
 		AMinionSoul* playerSoul = GetWorld()->SpawnActor<AMinionSoul>(BP_Soul, GetActorTransform());
 		if (playerSoul != nullptr)

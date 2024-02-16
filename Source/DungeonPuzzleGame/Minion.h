@@ -10,9 +10,11 @@
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
+struct FEnhancedInputActionEventBinding;
 class USpringArmComponent;
 class UCameraComponent;
 class USphereComponent;
+class UAnimMontage;
 
 class AMinionSoul;
 
@@ -52,15 +54,26 @@ class DUNGEONPUZZLEGAME_API AMinion : public ACharacter, public IPossessable
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* UnPossessAction;
 
+
+
 	//
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AMinionSoul> BP_Soul;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animations, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* PossessionMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Possession, meta = (AllowPrivateAccess = "true"))
 	bool bCanInput = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Possession, meta = (AllowPrivateAccess = "true"))
 	bool Possessing = false;
+
+
+	void Jump() override;
+
+	UFUNCTION()
+	void MontageBeginBlendOut(UAnimMontage* Montage, bool bInterrupted);
 
 public:
 	// Sets default values for this character's properties
@@ -69,6 +82,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	FEnhancedInputActionEventBinding* JumpActionBinding;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* AbilityAction;
 
 public:	
 	// Called every frame
@@ -81,9 +99,6 @@ public:
 	int GetSoulCost_Implementation();
 	void StoreSoulEnergy_Implementation(int EnergyToStore);
 	void PossessThis_Implementation();
-
-	//int GetStoredSoulEnergy() const { return StoredSoulEnergy; }
-	//void StoreSoulEnergy(int newSoulEnergy) { StoredSoulEnergy = newSoulEnergy; }
 
 private:
 	void Move(const FInputActionValue& Value);
