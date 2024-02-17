@@ -19,5 +19,6 @@ class DUNGEONPUZZLEGAME_API AMinion_Warrior : public AMinion, public IStrong
 public:
 
 private:
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	bool bIsPushing = false;
 };

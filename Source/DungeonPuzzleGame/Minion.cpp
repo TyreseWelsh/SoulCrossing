@@ -13,6 +13,7 @@
 #include "Kismet/KismetMathLibrary.h"
 
 #include "MinionSoul.h"
+#include "Interactable.h"
 
 
 // Sets default values
@@ -103,6 +104,7 @@ void AMinion::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		JumpActionBinding = &EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AMinion::Interact);
 		EnhancedInputComponent->BindAction(UnPossessAction, ETriggerEvent::Triggered, this, &AMinion::UnPossess);
 	}
 }
@@ -153,6 +155,28 @@ void AMinion::Look(const FInputActionValue& Value)
 	{
 		AddControllerYawInput(LookAxisVector.X);																// Add the input values to the pawns Yaw and Pitch
 		AddControllerPitchInput(LookAxisVector.Y);																//
+	}
+}
+
+void AMinion::Interact(const FInputActionValue& Value)
+{
+	FHitResult hit;
+
+	FVector TraceStartPos(GetMesh()->GetComponentLocation().X, GetMesh()->GetComponentLocation().Y, GetActorLocation().Z);			// Using actor location.z due to mesh relative offset being -110 offsetting from the actual world location
+	float TraceEndXOffset = GetMesh()->GetRightVector().X * 300.f;																	// Using meshes right vector because it is actually its forward vector (Y)
+	float TraceEndYOffset = GetMesh()->GetRightVector().Y * 300.f;
+	FVector TraceEndPos(TraceStartPos + FVector(TraceEndXOffset, TraceEndYOffset, 0));
+
+	GetWorld()->LineTraceSingleByChannel(hit, TraceStartPos, TraceEndPos, ECollisionChannel::ECC_Visibility);
+	UE_LOG(LogTemp, Error, TEXT("SHOULD INTERACT"));
+	if (hit.GetActor() != nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("HIT SOMETHING"));
+	}
+	if (IInteractable* InteractInterface = Cast<IInteractable>(hit.GetActor()))														// Checking if hit actor has interactable interface, will return true if not null
+	{
+		UE_LOG(LogTemp, Error, TEXT("INTERACTING"));
+		InteractInterface->Execute_Interact(hit.GetActor(), this);
 	}
 }
 

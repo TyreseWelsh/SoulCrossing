@@ -125,14 +125,6 @@ void AMinionSoul::Move(const FInputActionValue& Value)
 
 		AddMovementInput(ForwardDirection, MovementVector.Y);													// Adding input values Y value to get forward/backward movement since that is what the values translate to
 		AddMovementInput(RightDirection, MovementVector.X);														// Adding input values X value to get right/left movement ^
-
-
-		// Finds the rotator from the player meshes current relative rotation to that of the movement vector
-		// Then sets the relative rotation to the value of the lerp between the current mesh rotation and the target rotation
-		//FVector MovementVector3D(MovementVector.Y, MovementVector.X, 0);
-		//FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(PlayerStaticMesh->GetRelativeLocation(), PlayerStaticMesh->GetRelativeLocation() + MovementVector3D);
-
-		//PlayerStaticMesh->SetRelativeRotation(UKismetMathLibrary::RInterpTo(PlayerStaticMesh->GetRelativeRotation(), LookRotation, GetWorld()->GetDeltaSeconds(), 8));
 	}
 }
 

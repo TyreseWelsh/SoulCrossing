@@ -52,6 +52,9 @@ class DUNGEONPUZZLEGAME_API AMinion : public ACharacter, public IPossessable
 	UInputAction* JumpAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* UnPossessAction;
 
 
@@ -103,7 +106,7 @@ public:
 private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-
+	void Interact(const FInputActionValue& Value);
 	void UnPossess(const FInputActionValue& Value);
 
 	int SoulCost = 1;
