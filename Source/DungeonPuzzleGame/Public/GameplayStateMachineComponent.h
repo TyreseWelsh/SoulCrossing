@@ -9,11 +9,10 @@
 #include "GameplayStateMachineComponent.generated.h"
 
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FStateChangedSignature, const FGameplayTag&, NewStateTag);
-DECLARE_MULTICAST_DELEGATE_OneParam(FInitStateSignature, const FGameplayTag&, StateTag);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FTickStateSignature, float, DeltaTime, const FGameplayTag& StateTag);
-DECLARE_MULTICAST_DELEGATE_OneParam(FEndStateSignature, const FGameplayTag&, StateTag);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStateChangedSignature, const FGameplayTag&, NewStateTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInitStateSignature, const FGameplayTag&, StateTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTickStateSignature, float&, DeltaTime, const FGameplayTag&,StateTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEndStateSignature, const FGameplayTag&, StateTag);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable, BlueprintType)
 class DUNGEONPUZZLEGAME_API UGameplayStateMachineComponent : public UActorComponent
@@ -32,11 +31,11 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FTickStateSignature TickStateDelegate;
 	UPROPERTY(BlueprintAssignable)
-	FStateChangedSignature EndStateDelegate;
+	FStateChangedSignature StateChangedDelegate;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTag StateTag;
+	FGameplayTag CurrentStateTag;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag InitialStateTag;
 
@@ -47,7 +46,7 @@ public:
 	TArray<FGameplayTag> StateHistory;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int StateHistoryLength = 6;
+	int MaxStateHistoryLength = 6;
 
 	UFUNCTION(BlueprintCallable)
 	bool SwitchState(FGameplayTag NewStateTag);
