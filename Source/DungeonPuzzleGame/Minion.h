@@ -14,6 +14,7 @@ struct FEnhancedInputActionEventBinding;
 class USpringArmComponent;
 class UCameraComponent;
 class USphereComponent;
+class UGameplayStateManagerComponent;
 class UAnimMontage;
 
 class AMinionSoul;
@@ -58,11 +59,6 @@ class DUNGEONPUZZLEGAME_API AMinion : public ACharacter, public IPossessable
 	UInputAction* UnPossessAction;
 
 
-
-	//
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<AMinionSoul> BP_Soul;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animations, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* PossessionMontage;
 
@@ -73,7 +69,7 @@ class DUNGEONPUZZLEGAME_API AMinion : public ACharacter, public IPossessable
 	bool Possessing = false;
 
 
-	void Jump() override;
+	void NewJump();
 
 	UFUNCTION()
 	void MontageBeginBlendOut(UAnimMontage* Montage, bool bInterrupted);
@@ -91,7 +87,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* AbilityAction;
 
-public:	
+public:
+	//
+	UPROPERTY(EditAnywhere, Category = SoulBlueprint, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AMinionSoul> BP_Soul;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -103,11 +103,13 @@ public:
 	void StoreSoulEnergy_Implementation(int EnergyToStore);
 	void PossessThis_Implementation();
 
-private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Interact(const FInputActionValue& Value);
 	void UnPossess(const FInputActionValue& Value);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = StateMachine, meta = (AllowPrivateAccess = "true"))
+	UGameplayStateManagerComponent* StateManagerComponent;
 
 	int SoulCost = 1;
 	int StoredSoulEnergy = 0;
@@ -117,4 +119,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Possession", meta = (AllowPrivateAccess = "true"))
 	bool Possessed = false;
+
+private:
+
+
+
 };

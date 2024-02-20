@@ -10,6 +10,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "MinionPlayerController.h"
 
 #include "Possessable.h"
 
@@ -148,9 +149,11 @@ void AMinionSoul::PossessPawn(const FInputActionValue& Value)
 		{
 			if (PossessableInterface->Execute_GetSoulCost(SkeletonToPossess) <= SoulEnergy)			// Checking if the player has enough soul energy to possess the possessable object
 			{
+				AMinionPlayerController* MinionController = Cast<AMinionPlayerController>(GetController());
+
 				PossessableInterface->Execute_StoreSoulEnergy(SkeletonToPossess, SoulEnergy);
+				MinionController->Possess(Cast<APawn>(SkeletonToPossess));
 				PossessableInterface->Execute_PossessThis(SkeletonToPossess);
-				GetController()->Possess(Cast<APawn>(SkeletonToPossess));
 				Destroy();
 			}
 		}
