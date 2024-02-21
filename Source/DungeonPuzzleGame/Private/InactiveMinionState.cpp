@@ -11,17 +11,6 @@
 void UInactiveMinionState::OnEnterState(AActor* OwnerRef)
 {
 	Super::OnEnterState(OwnerRef);
-
-	if (PlayerReference->GetController())
-	{
-		if (AMinionPlayerController* MinionController = Cast<AMinionPlayerController>(PlayerReference->GetController()))
-		{
-			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(MinionController->GetLocalPlayer()))
-			{
-				Subsystem->RemoveMappingContext(MinionController->DefaultMappingContext);
-			}
-		}
-	}
 }
 
 void UInactiveMinionState::OnTickState()
@@ -38,6 +27,7 @@ void UInactiveMinionState::PressMove(const FInputActionValue& Value)
 
 void UInactiveMinionState::Look(const FInputActionValue& Value)
 {
+	Super::Look(Value);																		// Can still look in inactive state. Inputs during inactive state are only relevant during the possession animation
 }
 
 void UInactiveMinionState::PressJump()

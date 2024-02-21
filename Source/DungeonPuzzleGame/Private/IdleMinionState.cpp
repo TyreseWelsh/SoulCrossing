@@ -13,21 +13,6 @@
 void UIdleMinionState::OnEnterState(AActor* OwnerRef)
 {
 	Super::OnEnterState(OwnerRef);
-
-	if (PlayerReference->GetController())
-	{
-		AMinionPlayerController* MinionController = Cast<AMinionPlayerController>(PlayerReference->GetController());
-
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(MinionController->GetLocalPlayer()))
-		{
-			if (!Subsystem->HasMappingContext(MinionController->DefaultMappingContext))
-			{
-				Subsystem->AddMappingContext(MinionController->DefaultMappingContext, 0);
-
-				MinionController->SetupInputComponent();
-			}
-		}
-	}
 }
 
 void UIdleMinionState::OnTickState()

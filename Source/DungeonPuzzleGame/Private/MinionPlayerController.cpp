@@ -9,11 +9,6 @@
 void AMinionPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
-	//{
-	//	Subsystem->AddMappingContext(DefaultMappingContext, 0);
-	//}
 }
 
 void AMinionPlayerController::SetupInputComponent()
