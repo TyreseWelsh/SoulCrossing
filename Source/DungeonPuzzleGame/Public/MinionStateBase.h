@@ -22,6 +22,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	AMinion* PlayerReference = nullptr;
 	IMinionPlayerControllerInterface* PlayerController = nullptr;
+	AActor* InteractedObject = nullptr;
 
 	virtual void OnEnterState(AActor* OwnerRef) override;
 	virtual void OnTickState() override;
@@ -31,4 +32,5 @@ public:
 	virtual void Look(const FInputActionValue& Value);
 	virtual void PressJump();
 	virtual void PressUnPossess();
+	virtual void PressInteract(const FInputActionValue& Value);
 };

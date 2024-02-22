@@ -21,9 +21,9 @@ void AMinionPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMinionPlayerController::PressLook);
 		
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AMinionPlayerController::PressJump);							// Start jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AMinionPlayerController::PressJump);						// Stop jumping
+		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AMinionPlayerController::PressJump);						// Stop jumping
 		
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AMinionPlayerController::PressInteract);						// Regular interact
+		//EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AMinionPlayerController::PressInteract);						// Regular interact
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AMinionPlayerController::PressInteract);					// Most likely held interact
 		
 		EnhancedInputComponent->BindAction(UnPossessAction, ETriggerEvent::Triggered, this, &AMinionPlayerController::PressUnPossess);

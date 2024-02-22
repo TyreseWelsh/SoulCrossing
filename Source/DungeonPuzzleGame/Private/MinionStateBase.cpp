@@ -10,6 +10,12 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "../Interactable.h"
+#include "Weak.h"
+#include "Lightweight.h"
+#include "../Strong.h"
+#include "Heavy.h"
+#include "Pushable.h"
 
 void UMinionStateBase::OnEnterState(AActor* OwnerRef)
 {
@@ -33,8 +39,10 @@ void UMinionStateBase::OnEnterState(AActor* OwnerRef)
 		PlayerController->GetLookDelegate()->AddUObject(this, &UMinionStateBase::Look);
 		PlayerController->GetJumpDelegate()->AddUObject(this, &UMinionStateBase::PressJump);
 		PlayerController->GetUnPossessDelegate()->AddUObject(this, &UMinionStateBase::PressUnPossess);
+		PlayerController->GetInteractDelegate()->AddUObject(this, &UMinionStateBase::PressInteract);
 
 	}
+	
 }
 
 void UMinionStateBase::OnTickState()
@@ -50,17 +58,15 @@ void UMinionStateBase::OnExitState()
 	PlayerController->GetLookDelegate()->RemoveAll(this);
 	PlayerController->GetJumpDelegate()->RemoveAll(this);
 	PlayerController->GetUnPossessDelegate()->RemoveAll(this);
+	PlayerController->GetInteractDelegate()->RemoveAll(this);
 }
 
 void UMinionStateBase::PressMove(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	UE_LOG(LogTemp, Warning, TEXT("MOVE INPUT"));
-
 	if (PlayerReference->GetController() != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HAS CONTROLLER, SHOULD MOVE"));
 		const FRotator Rotation = PlayerReference->GetController()->GetControlRotation();						// Rotation of forward facing pawn
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
@@ -86,8 +92,11 @@ void UMinionStateBase::Look(const FInputActionValue& Value)
 
 void UMinionStateBase::PressJump()
 {
-	PlayerReference->Jump();
-	PlayerReference->StateManagerComponent->SwitchStateByKey("InAir");
+	if (PlayerReference->GetClass()->ImplementsInterface(UHeavy::StaticClass()) == false)
+	{
+		PlayerReference->Jump();
+		PlayerReference->StateManagerComponent->SwitchStateByKey("InAir");
+	}
 }
 
 void UMinionStateBase::PressUnPossess()
@@ -102,5 +111,51 @@ void UMinionStateBase::PressUnPossess()
 	{
 		playerSoul->SetSoulEnergy(PlayerReference->StoredSoulEnergy);
 		PlayerReference->GetController()->Possess(playerSoul);
+	}
+}
+
+void UMinionStateBase::PressInteract(const FInputActionValue& Value)
+{
+	FHitResult Hit;
+	float TraceLength = 125.f;
+
+	// Creating line trace when interact button is pressed to check if there is any interactable object in distance of the player
+	FVector TraceStartPos(PlayerReference->GetActorLocation());
+	float TraceEndPosX(TraceStartPos.X + (PlayerReference->GetActorForwardVector().X * (TraceLength * PlayerReference->GetMesh()->GetRelativeScale3D().Y)));
+	float TraceEndPosY(TraceStartPos.Y + (PlayerReference->GetActorForwardVector().Y * (TraceLength * PlayerReference->GetMesh()->GetRelativeScale3D().X)));
+	FVector TraceEndPos(TraceEndPosX, TraceEndPosY, PlayerReference->GetActorLocation().Z);
+
+	PlayerReference->GetWorld()->LineTraceSingleByChannel(Hit, TraceStartPos, TraceEndPos, ECollisionChannel::ECC_Visibility);
+
+	if (Hit.GetActor())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("INTERACTING WITH OBJECT!"));
+		if (Hit.GetActor()->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+		{
+			// Interactions for when the player character is "Weak" and the interactable object is "Lightweight"
+			if (PlayerReference->GetClass()->ImplementsInterface(UWeak::StaticClass())
+				&& Hit.GetActor()->GetClass()->ImplementsInterface(ULightweight::StaticClass()))
+			{
+				if (Cast<IPushable>(Hit.GetActor())->Execute_GetPushable(Hit.GetActor()))										// If interactable object is pushable
+				{
+					PlayerReference->StateManagerComponent->SwitchStateByKey("Pushing");
+					return;
+				}
+
+				PlayerReference->StateManagerComponent->SwitchStateByKey("Interacting");											// If the player is weak, interactable object is lightweight but is not pushable, switch to the normal interaction state
+			}
+			// Interactions for when the player character is "Strong" and the interactable object is "Heavy"
+			else if (PlayerReference->GetClass()->ImplementsInterface(UStrong::StaticClass())
+				&& Hit.GetActor()->GetClass()->ImplementsInterface(UHeavy::StaticClass()))
+			{
+				if (Cast<IPushable>(Hit.GetActor())->Execute_GetPushable(Hit.GetActor()))										// If interactable object is pushable
+				{
+					PlayerReference->StateManagerComponent->SwitchStateByKey("Pushing");
+					return;
+				}
+
+				PlayerReference->StateManagerComponent->SwitchStateByKey("Interacting");											// If the player is strong, interactable object is heavy but is not pushable, switch to the normal interaction state
+			}
+		}
 	}
 }

@@ -48,3 +48,8 @@ void UInAirMinionState::PressUnPossess()
 {
 	// CANT UNPOSSESS IN AIR STATE
 }
+
+void UInAirMinionState::PressInteract(const FInputActionValue& Value)
+{
+	// CANT INTERACT IN AIR STATE (MIGHT SWAP ROGUE SKELETON CLIMB TO INTERACT FROM ABILITY(?))
+}

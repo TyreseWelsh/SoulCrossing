@@ -22,4 +22,5 @@ class DUNGEONPUZZLEGAME_API UIdleMinionState : public UMinionStateBase
 	virtual void Look(const FInputActionValue& Value) override;
 	virtual void PressJump() override;
 	virtual void PressUnPossess() override;
+	virtual void PressInteract(const FInputActionValue& Value);
 };

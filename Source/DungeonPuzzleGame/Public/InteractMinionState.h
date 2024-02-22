@@ -4,17 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "MinionStateBase.h"
-#include "InAirMinionState.generated.h"
+#include "InteractMinionState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DUNGEONPUZZLEGAME_API UInAirMinionState : public UMinionStateBase
+class DUNGEONPUZZLEGAME_API UInteractMinionState : public UMinionStateBase
 {
 	GENERATED_BODY()
 	
-protected:
 	virtual void OnEnterState(AActor* OwnerRef) override;
 	virtual void OnTickState() override;
 	virtual void OnExitState() override;

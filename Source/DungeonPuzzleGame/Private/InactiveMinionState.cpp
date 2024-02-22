@@ -15,10 +15,12 @@ void UInactiveMinionState::OnEnterState(AActor* OwnerRef)
 
 void UInactiveMinionState::OnTickState()
 {
+	Super::OnTickState();
 }
 
 void UInactiveMinionState::OnExitState()
 {
+	Super::OnExitState();
 }
 
 void UInactiveMinionState::PressMove(const FInputActionValue& Value)
@@ -35,5 +37,9 @@ void UInactiveMinionState::PressJump()
 }
 
 void UInactiveMinionState::PressUnPossess()
+{
+}
+
+void UInactiveMinionState::PressInteract(const FInputActionValue& Value)
 {
 }

@@ -117,8 +117,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float BaseMoveSpeed = 600.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Possession", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Possession, meta = (AllowPrivateAccess = "true"))
 	bool Possessed = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	bool bPushing = false;
 
 private:
 

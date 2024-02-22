@@ -52,3 +52,8 @@ void UIdleMinionState::PressUnPossess()
 {
 	Super::PressUnPossess();
 }
+
+void UIdleMinionState::PressInteract(const FInputActionValue& Value)
+{
+	Super::PressInteract(Value);
+}
