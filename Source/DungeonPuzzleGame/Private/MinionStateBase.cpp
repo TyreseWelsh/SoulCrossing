@@ -16,6 +16,7 @@
 #include "../Strong.h"
 #include "Heavy.h"
 #include "Pushable.h"
+#include "Activatable.h"
 
 void UMinionStateBase::OnEnterState(AActor* OwnerRef)
 {
@@ -130,31 +131,34 @@ void UMinionStateBase::PressInteract(const FInputActionValue& Value)
 	if (Hit.GetActor())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("INTERACTING WITH OBJECT!"));
-		if (Hit.GetActor()->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+		if(IInteractable* InteractInterface = Cast<IInteractable>(Hit.GetActor()))
 		{
-			// Interactions for when the player character is "Weak" and the interactable object is "Lightweight"
-			if (PlayerReference->GetClass()->ImplementsInterface(UWeak::StaticClass())
-				&& Hit.GetActor()->GetClass()->ImplementsInterface(ULightweight::StaticClass()))
+			if (InteractInterface->Execute_IsInteractable(Hit.GetActor()))													// Check if the interactable object is currently interactable
 			{
-				if (Cast<IPushable>(Hit.GetActor())->Execute_GetPushable(Hit.GetActor()))										// If interactable object is pushable
+				// Interactions for when the player character is "Weak" and the interactable object is "Lightweight"
+				if (PlayerReference->GetClass()->ImplementsInterface(UWeak::StaticClass())
+					&& Hit.GetActor()->GetClass()->ImplementsInterface(ULightweight::StaticClass()))
 				{
-					PlayerReference->StateManagerComponent->SwitchStateByKey("Pushing");
-					return;
-				}
+					if (Cast<IPushable>(Hit.GetActor())->Execute_GetPushable(Hit.GetActor()))										// If interactable object is pushable
+					{
+						PlayerReference->StateManagerComponent->SwitchStateByKey("Pushing");
+						return;
+					}
 
-				PlayerReference->StateManagerComponent->SwitchStateByKey("Interacting");											// If the player is weak, interactable object is lightweight but is not pushable, switch to the normal interaction state
-			}
-			// Interactions for when the player character is "Strong" and the interactable object is "Heavy"
-			else if (PlayerReference->GetClass()->ImplementsInterface(UStrong::StaticClass())
-				&& Hit.GetActor()->GetClass()->ImplementsInterface(UHeavy::StaticClass()))
-			{
-				if (Cast<IPushable>(Hit.GetActor())->Execute_GetPushable(Hit.GetActor()))										// If interactable object is pushable
+					PlayerReference->StateManagerComponent->SwitchStateByKey("Interacting");											// If the player is weak, interactable object is lightweight but is not pushable, switch to the normal interaction state
+				}
+				// Interactions for when the player character is "Strong" and the interactable object is "Heavy"
+				else if (PlayerReference->GetClass()->ImplementsInterface(UStrong::StaticClass())
+					&& Hit.GetActor()->GetClass()->ImplementsInterface(UHeavy::StaticClass()))
 				{
-					PlayerReference->StateManagerComponent->SwitchStateByKey("Pushing");
-					return;
-				}
+					if (Cast<IPushable>(Hit.GetActor())->Execute_GetPushable(Hit.GetActor()))										// If interactable object is pushable
+					{
+						PlayerReference->StateManagerComponent->SwitchStateByKey("Pushing");
+						return;
+					}
 
-				PlayerReference->StateManagerComponent->SwitchStateByKey("Interacting");											// If the player is strong, interactable object is heavy but is not pushable, switch to the normal interaction state
+					PlayerReference->StateManagerComponent->SwitchStateByKey("Interacting");											// If the player is strong, interactable object is heavy but is not pushable, switch to the normal interaction state
+				}
 			}
 		}
 	}

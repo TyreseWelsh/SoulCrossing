@@ -16,7 +16,7 @@ void UPushingMinionState::OnEnterState(AActor* OwnerRef)
 	if (PlayerReference)
 	{
 		FHitResult Hit;
-		float TraceLength = 125.f;
+		float TraceLength = PlayerReference->InteractionDistance;
 
 		FVector TraceStartPos(PlayerReference->GetActorLocation());
 		float TraceEndPosX(TraceStartPos.X + (PlayerReference->GetActorForwardVector().X * (TraceLength * PlayerReference->GetMesh()->GetRelativeScale3D().Y)));

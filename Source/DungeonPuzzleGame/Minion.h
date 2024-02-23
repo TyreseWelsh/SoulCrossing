@@ -113,6 +113,7 @@ public:
 
 	int SoulCost = 1;
 	int StoredSoulEnergy = 0;
+	float InteractionDistance = 125.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float BaseMoveSpeed = 600.f;

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Interactable.h"
+#include "../DungeonPuzzleGame/Public/InteractableObject.h"
 #include "../DungeonPuzzleGame/Public/Heavy.h"
 #include "../DungeonPuzzleGame/Public/Pushable.h"
 #include "HeavyMetal_Block.generated.h"
@@ -15,7 +15,7 @@ class UStaticMeshComponent;
 class UPhysicsConstraintComponent;
 
 UCLASS()
-class DUNGEONPUZZLEGAME_API AHeavyMetal_Block : public AActor, public IInteractable, public IHeavy, public IPushable
+class DUNGEONPUZZLEGAME_API AHeavyMetal_Block : public AInteractableObject, public IHeavy, public IPushable
 {
 	GENERATED_BODY()
 
@@ -36,7 +36,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void Interact_Implementation(AMinion* InteractingSkeleton);
+	virtual void Interact_Implementation(AMinion* InteractingSkeleton) override;
+	virtual bool IsInteractable_Implementation() override;
 	void StartPush_Implementation();
 	void StopPush_Implementation();
 	bool GetPushable_Implementation();
@@ -53,6 +54,7 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	UPhysicsConstraintComponent* PushConstraint;
+
 
 	bool bPushable = false;
 };

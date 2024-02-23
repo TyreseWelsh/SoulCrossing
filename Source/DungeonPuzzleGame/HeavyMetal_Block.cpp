@@ -83,11 +83,13 @@ void AHeavyMetal_Block::EndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 
 void AHeavyMetal_Block::Interact_Implementation(AMinion* InteractingSkeleton)
 {
-	//if (IStrong* StrongInterface = Cast<IStrong>(InteractingSkeleton))
-	//{
-	//	UE_LOG(LogTemp, Error, TEXT("INteract with heavy"));
-	//	BlockCollider->SetSimulatePhysics(true);
-	//}
+	UE_LOG(LogTemp, Warning, TEXT("Heavy box interaction implemetnation"));
+	//Super::Interact_Implementation(InteractingSkeleton);
+}
+
+bool AHeavyMetal_Block::IsInteractable_Implementation()
+{
+	return bCanInteract;
 }
 
 void AHeavyMetal_Block::StartPush_Implementation()
