@@ -84,7 +84,7 @@ void AHeavyMetal_Block::EndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 void AHeavyMetal_Block::Interact_Implementation(AMinion* InteractingSkeleton)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Heavy box interaction implemetnation"));
-	//Super::Interact_Implementation(InteractingSkeleton);
+	Super::Interact_Implementation(InteractingSkeleton);
 }
 
 bool AHeavyMetal_Block::IsInteractable_Implementation()

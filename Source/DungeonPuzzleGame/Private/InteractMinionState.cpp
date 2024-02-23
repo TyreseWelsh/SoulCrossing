@@ -3,6 +3,9 @@
 
 #include "InteractMinionState.h"
 #include "../Minion.h"
+#include "GameplayStateManagerComponent.h"
+
+#include "../Interactable.h"
 
 void UInteractMinionState::OnEnterState(AActor* OwnerRef)
 {
@@ -10,7 +13,7 @@ void UInteractMinionState::OnEnterState(AActor* OwnerRef)
 
 	if (PlayerReference)
 	{
-		// NOTE: MIGHT WANT TO WHACK THIS IN A FUNCTION AT SOME POINT
+		// NOTE: MIGHT WANT TO WHACK THIS TRACE IN A FUNCTION AT SOME POINT
 		FHitResult Hit;
 		float TraceLength = PlayerReference->InteractionDistance;
 
@@ -23,17 +26,26 @@ void UInteractMinionState::OnEnterState(AActor* OwnerRef)
 		InteractedObject = Hit.GetActor();
 
 		// TODO: LOOK THROUGH PUSHING MINION STATE AND DO SIMILAR HERE
+		PlayerReference->bInteracting = true;
+		if (IInteractable* InteractInterface = Cast<IInteractable>(InteractedObject))
+		{
+			InteractInterface->Execute_Interact(InteractedObject, Cast<AMinion>(OwnerRef));
+		}
 	}
 }
 
 void UInteractMinionState::OnTickState()
 {
 	Super::OnTickState();
+	PlayerReference->StateManagerComponent->SwitchStateByKey("Idle");
 }
 
 void UInteractMinionState::OnExitState()
 {
 	Super::OnExitState();
+
+	PlayerReference->bInteracting = false;
+	InteractedObject = nullptr;
 }
 
 void UInteractMinionState::PressMove(const FInputActionValue& Value)
