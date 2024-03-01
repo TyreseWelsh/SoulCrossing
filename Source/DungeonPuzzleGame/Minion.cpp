@@ -57,7 +57,7 @@ AMinion::AMinion()
 void AMinion::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	StateManagerComponent->InitStateManager();
 
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))													// Casting actor controller to a controller that is used for pawns

@@ -13,6 +13,7 @@ class AMinion;
 class UBoxComponent;
 class UStaticMeshComponent;
 class UPhysicsConstraintComponent;
+class USceneComponent;
 
 UCLASS()
 class DUNGEONPUZZLEGAME_API AHeavyMetal_Block : public AInteractableObject, public IHeavy, public IPushable
@@ -38,16 +39,16 @@ public:
 
 	virtual void Interact_Implementation(AMinion* InteractingSkeleton) override;
 	virtual bool IsInteractable_Implementation() override;
-	void StartPush_Implementation();
+	void StartPush_Implementation(AMinion* InteractingMinion);
 	void StopPush_Implementation();
 	bool GetPushable_Implementation();
 
 private:
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* BlockCollider;
+	//UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	//UBoxComponent* BlockCollider;
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* PlaceholderMesh;
+	//UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	//UStaticMeshComponent* PlaceholderMesh;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* PushableArea;
@@ -55,6 +56,11 @@ private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	UPhysicsConstraintComponent* PushConstraint;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* InteractionPoint1;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* InteractionPoint2;
 
 	bool bPushable = false;
 };

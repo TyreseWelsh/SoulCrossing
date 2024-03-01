@@ -7,6 +7,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
+#include "Components/SceneComponent.h"
 
 #include "Minion.h"
 
@@ -14,30 +15,20 @@
 // Sets default values
 AHeavyMetal_Block::AHeavyMetal_Block()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	MainCollider->SetBoxExtent(FVector(150.f, 150.f, 150.f));
+	MainCollider->SetMassOverrideInKg(NAME_None, 200.f);
+	MainCollider->SetLinearDamping(12.f);
 
-	BlockCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("BlockCollider"));
-	BlockCollider->SetBoxExtent(FVector(150.f, 150.f, 150.f));
-	BlockCollider->SetMassOverrideInKg(NAME_None, 700.f);
-	BlockCollider->SetLinearDamping(4.f);
-	BlockCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	BlockCollider->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-	RootComponent = BlockCollider;
-
-	PlaceholderMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaceholderMesh"));
-	PlaceholderMesh->SetRelativeScale3D(FVector(3.f, 3.f, 3.f));
-	PlaceholderMesh->SetLinearDamping(0.0f);
-	PlaceholderMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	PlaceholderMesh->SetupAttachment(BlockCollider);
+	Mesh->SetRelativeScale3D(FVector(6.f, 6.f, 6.f));
+	Mesh->SetLinearDamping(0.0f);
 
 	PushableArea = CreateDefaultSubobject<UBoxComponent>(TEXT("PushArea"));
-	PushableArea->SetBoxExtent(FVector(150.f, 150.f, 150.f));
+	PushableArea->SetBoxExtent(FVector(60.f, 10.f, 10.f));
 	PushableArea->SetLinearDamping(0.f);
 	PushableArea->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	PushableArea->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	PushableArea->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
-	PushableArea->SetupAttachment(PlaceholderMesh);
+	PushableArea->SetupAttachment(Mesh);
 
 	PushConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("PushConstraint"));
 	PushConstraint->ComponentName1.ComponentName = FName(TEXT("PlaceholderMesh"));
@@ -47,7 +38,16 @@ AHeavyMetal_Block::AHeavyMetal_Block()
 	PushConstraint->SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0.0f);
 	PushConstraint->SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0.0f);
 	PushConstraint->SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0.0f);
-	PushConstraint->SetupAttachment(PlaceholderMesh);
+	PushConstraint->SetupAttachment(Mesh);
+
+	InteractionPoint1 = CreateDefaultSubobject<USceneComponent>(TEXT("InteractionPoint1"));
+	InteractionPoint1->SetupAttachment(MainCollider);
+
+	InteractionPoint2 = CreateDefaultSubobject<USceneComponent>(TEXT("InteractionPoint2"));
+	InteractionPoint2->SetupAttachment(MainCollider);
+
+	InteractionPoints.Add(InteractionPoint1);
+	InteractionPoints.Add(InteractionPoint2);
 }
 
 // Called when the game starts or when spawned
@@ -83,8 +83,7 @@ void AHeavyMetal_Block::EndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 
 void AHeavyMetal_Block::Interact_Implementation(AMinion* InteractingSkeleton)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Heavy box interaction implemetnation"));
-	Super::Interact_Implementation(InteractingSkeleton);
+
 }
 
 bool AHeavyMetal_Block::IsInteractable_Implementation()
@@ -92,14 +91,40 @@ bool AHeavyMetal_Block::IsInteractable_Implementation()
 	return bCanInteract;
 }
 
-void AHeavyMetal_Block::StartPush_Implementation()
+void AHeavyMetal_Block::StartPush_Implementation(AMinion* InteractingMinion)
 {
-	BlockCollider->SetSimulatePhysics(true);
+	if (InteractionPoints.Num() > 0)
+	{
+		USceneComponent* ClosestInteractionPoint = InteractionPoints[0];
+
+		for (USceneComponent* CurrentInteractionPoint : InteractionPoints)
+		{
+			FVector CurrentPointWorldLocation = GetActorLocation() + CurrentInteractionPoint->GetRelativeLocation();
+			FVector ClosestPointWorldLocation = GetActorLocation() + ClosestInteractionPoint->GetRelativeLocation();
+
+			double DistanceToCurrentPoint = FVector::Distance(InteractingMinion->GetActorLocation(), CurrentPointWorldLocation);
+			double DistanceToClosestPoint = FVector::Distance(InteractingMinion->GetActorLocation(), ClosestPointWorldLocation);
+
+			if (DistanceToCurrentPoint < DistanceToClosestPoint)
+			{
+				ClosestInteractionPoint = CurrentInteractionPoint;
+			}
+		}
+
+		FVector NewMinionLocation = FVector(GetActorLocation().X + ClosestInteractionPoint->GetRelativeLocation().X, GetActorLocation().Y, InteractingMinion->GetActorLocation().Z);
+		FRotator NewMinionRotation = GetActorRotation().Add(0, ClosestInteractionPoint->GetRelativeRotation().Yaw, 0);
+		
+		InteractingMinion->SetActorLocation(NewMinionLocation, false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
+		InteractingMinion->SetActorRotation(NewMinionRotation, ETeleportType::TeleportPhysics);
+	}
+
+
+	MainCollider->SetSimulatePhysics(true);
 }
 
 void AHeavyMetal_Block::StopPush_Implementation()
 {
-	BlockCollider->SetSimulatePhysics(false);
+	MainCollider->SetSimulatePhysics(false);
 }
 
 bool AHeavyMetal_Block::GetPushable_Implementation()

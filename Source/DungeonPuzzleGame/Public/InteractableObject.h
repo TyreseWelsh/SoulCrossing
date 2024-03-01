@@ -8,6 +8,10 @@
 #include "InteractableObject.generated.h"
 
 class AMinion;
+class UBoxComponent;
+class UStaticMeshComponent;
+class UActorComponent;
+class USceneComponent;
 
 UCLASS()
 class DUNGEONPUZZLEGAME_API AInteractableObject : public AActor, public IInteractable
@@ -25,11 +29,20 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UBoxComponent* MainCollider;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UStaticMeshComponent* Mesh;
+
+	TArray<USceneComponent*> InteractionPoints;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void Interact_Implementation(AMinion* InteractingSkeleton);
+	virtual void Interact_Implementation(AMinion* InteractingMinion);
 	virtual bool IsInteractable_Implementation();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

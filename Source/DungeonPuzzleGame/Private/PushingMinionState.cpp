@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputActionValue.h"
 #include "GameplayStateManagerComponent.h"
+//#include "Components/SkeletalMeshComponent.h"
 
 #include "Pushable.h"
 
@@ -28,11 +29,12 @@ void UPushingMinionState::OnEnterState(AActor* OwnerRef)
 
 		PlayerReference->bPushing = true;
 		PlayerReference->GetCharacterMovement()->bOrientRotationToMovement = false;
-		PlayerReference->SetActorRotation(InteractedObject->GetActorRotation());
+		//PlayerReference->SetActorRotation(InteractedObject->GetActorRotation());
 
 		if (IPushable* PushableInterface = Cast<IPushable>(InteractedObject))
 		{
-			PushableInterface->Execute_StartPush(InteractedObject);
+			AMinion* InteractingMinion = Cast<AMinion>(OwnerRef);
+			PushableInterface->Execute_StartPush(InteractedObject, InteractingMinion);
 		}
 	}
 }
