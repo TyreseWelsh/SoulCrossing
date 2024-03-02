@@ -23,4 +23,5 @@ class DUNGEONPUZZLEGAME_API UPushingMinionState : public UMinionStateBase
 	virtual void PressJump();
 	virtual void PressUnPossess();
 	virtual void PressInteract(const FInputActionValue& Value);
+	virtual void PressAbility() override;
 };

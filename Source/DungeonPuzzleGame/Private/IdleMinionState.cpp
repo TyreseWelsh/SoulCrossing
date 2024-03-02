@@ -13,6 +13,11 @@
 void UIdleMinionState::OnEnterState(AActor* OwnerRef)
 {
 	Super::OnEnterState(OwnerRef);
+
+	if (PlayerReference)
+	{
+		PlayerReference->HoverTimer = 0.f;
+	}
 }
 
 void UIdleMinionState::OnTickState()
@@ -56,4 +61,9 @@ void UIdleMinionState::PressUnPossess()
 void UIdleMinionState::PressInteract(const FInputActionValue& Value)
 {
 	Super::PressInteract(Value);
+}
+
+void UIdleMinionState::PressAbility()
+{
+	Super::PressAbility();
 }

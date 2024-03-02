@@ -25,12 +25,7 @@ void UInteractMinionState::OnEnterState(AActor* OwnerRef)
 		PlayerReference->GetWorld()->LineTraceSingleByChannel(Hit, TraceStartPos, TraceEndPos, ECollisionChannel::ECC_Visibility);
 		InteractedObject = Hit.GetActor();
 
-		// TODO: LOOK THROUGH PUSHING MINION STATE AND DO SIMILAR HERE
 		PlayerReference->bInteracting = true;
-		if (IInteractable* InteractInterface = Cast<IInteractable>(InteractedObject))
-		{
-			InteractInterface->Execute_Interact(InteractedObject, Cast<AMinion>(OwnerRef));
-		}
 	}
 }
 
@@ -65,5 +60,9 @@ void UInteractMinionState::PressUnPossess()
 }
 
 void UInteractMinionState::PressInteract(const FInputActionValue& Value)
+{
+}
+
+void UInteractMinionState::PressAbility()
 {
 }

@@ -6,6 +6,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayStateManagerComponent.h"
 
+#include "Magic.h"
+
 void UInAirMinionState::OnEnterState(AActor* OwnerRef)
 {
 	Super::OnEnterState(OwnerRef);
@@ -52,4 +54,16 @@ void UInAirMinionState::PressUnPossess()
 void UInAirMinionState::PressInteract(const FInputActionValue& Value)
 {
 	// CANT INTERACT IN AIR STATE (MIGHT SWAP ROGUE SKELETON CLIMB TO INTERACT FROM ABILITY(?))
+}
+
+void UInAirMinionState::PressAbility()
+{
+	if (PlayerReference != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SHOULD HOVER"));
+		if (PlayerReference->GetClass()->ImplementsInterface(UMagic::StaticClass()) && PlayerReference->HoverTimer < PlayerReference->MAX_HOVER_TIME)
+		{
+			PlayerReference->StateManagerComponent->SwitchStateByKey("Hover");
+		}
+	}
 }

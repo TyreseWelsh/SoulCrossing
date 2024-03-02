@@ -13,7 +13,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FLookSignature, const FInputActionValue&);
 DECLARE_MULTICAST_DELEGATE(FJumpSignature);
 DECLARE_MULTICAST_DELEGATE_OneParam(FInteractSignature, const FInputActionValue&);
 DECLARE_MULTICAST_DELEGATE(FUnPossessSignature);
-DECLARE_MULTICAST_DELEGATE_OneParam(FAbilitySignature, const FInputActionValue&);
+DECLARE_MULTICAST_DELEGATE(FAbilitySignature);
 
 
 // This class does not need to be modified.
@@ -41,5 +41,4 @@ public:
 	virtual FInteractSignature* GetInteractDelegate() = 0;
 	virtual FUnPossessSignature* GetUnPossessDelegate() = 0;
 	virtual FAbilitySignature* GetAbilityDelegate() = 0;
-
 };

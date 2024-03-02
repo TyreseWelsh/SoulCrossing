@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "MinionStateBase.h"
-#include "IdleMinionState.generated.h"
+#include "FloatMinionState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DUNGEONPUZZLEGAME_API UIdleMinionState : public UMinionStateBase
+class DUNGEONPUZZLEGAME_API UFloatMinionState : public UMinionStateBase
 {
 	GENERATED_BODY()
-
+	
 	virtual void OnEnterState(AActor* OwnerRef) override;
 	virtual void OnTickState() override;
 	virtual void OnExitState() override;
@@ -24,4 +24,6 @@ class DUNGEONPUZZLEGAME_API UIdleMinionState : public UMinionStateBase
 	virtual void PressUnPossess() override;
 	virtual void PressInteract(const FInputActionValue& Value);
 	virtual void PressAbility() override;
+
+	float OldGravityScale = 0;
 };

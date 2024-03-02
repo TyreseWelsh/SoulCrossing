@@ -29,13 +29,6 @@ void UPushingMinionState::OnEnterState(AActor* OwnerRef)
 
 		PlayerReference->bPushing = true;
 		PlayerReference->GetCharacterMovement()->bOrientRotationToMovement = false;
-		//PlayerReference->SetActorRotation(InteractedObject->GetActorRotation());
-
-		if (IPushable* PushableInterface = Cast<IPushable>(InteractedObject))
-		{
-			AMinion* InteractingMinion = Cast<AMinion>(OwnerRef);
-			PushableInterface->Execute_StartPush(InteractedObject, InteractingMinion);
-		}
 	}
 }
 
@@ -94,5 +87,9 @@ void UPushingMinionState::PressUnPossess()
 }
 
 void UPushingMinionState::PressInteract(const FInputActionValue& Value)
+{
+}
+
+void UPushingMinionState::PressAbility()
 {
 }

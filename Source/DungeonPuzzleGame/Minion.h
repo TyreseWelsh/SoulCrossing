@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Possessable.h"
+#include "../DungeonPuzzleGame/Public/Weak.h"
+#include "../DungeonPuzzleGame/Public/Magic.h"
 #include "Minion.generated.h"
 
 class UInputMappingContext;
@@ -20,7 +22,7 @@ class UAnimMontage;
 class AMinionSoul;
 
 UCLASS()
-class DUNGEONPUZZLEGAME_API AMinion : public ACharacter, public IPossessable
+class DUNGEONPUZZLEGAME_API AMinion : public ACharacter, public IPossessable, public IWeak, public IMagic
 {
 	GENERATED_BODY()
 
@@ -125,6 +127,11 @@ public:
 	bool bInteracting = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	bool bPushing = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	bool bHovering = false;
+	float HoverTimer = 0.f;
+	const float MAX_HOVER_TIME = 2.f;
 
 private:
 

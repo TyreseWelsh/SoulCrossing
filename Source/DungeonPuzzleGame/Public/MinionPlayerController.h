@@ -56,7 +56,7 @@ public:
 	void PressJump();
 	void PressInteract(const FInputActionValue& Value);
 	void PressUnPossess();
-	void PressAbility(const FInputActionValue& Value);
+	void PressAbility();
 
 private:
 	FMoveSignature MoveDelegate;

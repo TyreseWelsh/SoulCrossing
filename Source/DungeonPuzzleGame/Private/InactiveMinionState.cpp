@@ -43,3 +43,8 @@ void UInactiveMinionState::PressUnPossess()
 void UInactiveMinionState::PressInteract(const FInputActionValue& Value)
 {
 }
+
+void UInactiveMinionState::PressAbility()
+{
+	Super::PressAbility();
+}

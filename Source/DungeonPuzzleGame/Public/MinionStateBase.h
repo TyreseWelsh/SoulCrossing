@@ -33,4 +33,5 @@ public:
 	virtual void PressJump();
 	virtual void PressUnPossess();
 	virtual void PressInteract(const FInputActionValue& Value);
+	virtual void PressAbility();
 };

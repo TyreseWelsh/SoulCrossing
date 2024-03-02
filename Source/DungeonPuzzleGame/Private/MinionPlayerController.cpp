@@ -103,10 +103,10 @@ void AMinionPlayerController::PressUnPossess()
 	}
 }
 
-void AMinionPlayerController::PressAbility(const FInputActionValue& Value)
+void AMinionPlayerController::PressAbility()
 {
 	if (AbilityDelegate.IsBound())
 	{
-		AbilityDelegate.Broadcast(Value);
+		AbilityDelegate.Broadcast();
 	}
 }

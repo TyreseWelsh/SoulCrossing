@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "../Interactable.h"
+#include "Lightweight.h"
 #include "InteractableObject.generated.h"
 
 class AMinion;
@@ -14,7 +15,7 @@ class UActorComponent;
 class USceneComponent;
 
 UCLASS()
-class DUNGEONPUZZLEGAME_API AInteractableObject : public AActor, public IInteractable
+class DUNGEONPUZZLEGAME_API AInteractableObject : public AActor, public IInteractable, public ILightweight
 {
 	GENERATED_BODY()
 	

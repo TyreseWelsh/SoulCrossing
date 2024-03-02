@@ -24,4 +24,5 @@ protected:
 	virtual void PressJump() override;
 	virtual void PressUnPossess() override;
 	virtual void PressInteract(const FInputActionValue& Value);
+	virtual void PressAbility() override;
 };
