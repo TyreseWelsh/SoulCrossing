@@ -2,6 +2,9 @@
 
 
 #include "ActivatableObject.h"
+#include "Components/BoxComponent.h"
+#include "Components/StaticMeshComponent.h"
+
 
 // Sets default values
 AActivatableObject::AActivatableObject()
@@ -9,6 +12,15 @@ AActivatableObject::AActivatableObject()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	MainCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("MainCollider"));
+	MainCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	MainCollider->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	MainCollider->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+	RootComponent = MainCollider;
+
+	MainMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MainMesh"));
+	MainMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	MainMesh->SetupAttachment(MainCollider);
 }
 
 // Called when the game starts or when spawned
@@ -27,7 +39,7 @@ void AActivatableObject::Tick(float DeltaTime)
 
 bool AActivatableObject::CanActivate_Implementation()
 {
-	return CanActivate;
+	return bCanActivate;
 }
 
 void AActivatableObject::Activate_Implementation()

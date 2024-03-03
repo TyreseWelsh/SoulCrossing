@@ -7,6 +7,9 @@
 #include "Activatable.h"
 #include "ActivatableObject.generated.h"
 
+class UBoxComponent;
+class UStaticMeshComponent;
+
 UCLASS()
 class DUNGEONPUZZLEGAME_API AActivatableObject : public AActor, public IActivatable
 {
@@ -16,9 +19,17 @@ public:
 	// Sets default values for this actor's properties
 	AActivatableObject();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UBoxComponent* MainCollider;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* MainMesh;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	bool bAlreadyActivated = false;
 
 public:	
 	// Called every frame
@@ -28,7 +39,10 @@ public:
 	virtual bool CanActivate_Implementation();
 	virtual void Activate_Implementation();
 
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+	bool bCanActivate = true;
+
 private:
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	bool CanActivate = true;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	//bool bActivated = false;
 };
