@@ -111,6 +111,11 @@ void AMinionSoul::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	}
 }
 
+void AMinionSoul::SetSoulCameraRotation(FRotator ControllerRotation)
+{
+	Controller->SetControlRotation(ControllerRotation);
+}
+
 void AMinionSoul::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -152,8 +157,9 @@ void AMinionSoul::PossessPawn(const FInputActionValue& Value)
 				AMinionPlayerController* MinionController = Cast<AMinionPlayerController>(GetController());
 
 				PossessableInterface->Execute_StoreSoulEnergy(SkeletonToPossess, SoulEnergy);
+				FRotator ControllerRotation = GetControlRotation();
 				MinionController->Possess(Cast<APawn>(SkeletonToPossess));
-				PossessableInterface->Execute_PossessThis(SkeletonToPossess);
+				PossessableInterface->Execute_PossessThis(SkeletonToPossess, ControllerRotation);
 				Destroy();
 			}
 		}

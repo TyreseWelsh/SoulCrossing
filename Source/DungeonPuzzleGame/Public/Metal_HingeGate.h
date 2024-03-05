@@ -38,5 +38,5 @@ private:
 	void ActivationFinished();
 
 	FVector GateStartPosition;
-	float GateZOffset = 400.f;
+	float GateZOffset = 0.f;
 };

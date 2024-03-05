@@ -47,8 +47,10 @@ void AMetal_HingeGate::Activate_Implementation()
 void AMetal_HingeGate::ActivationUpdate(float Alpha)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Update Gate Position..."));
+	GateZOffset = (50 * MainMesh->GetRelativeScale3D().Z * 2) + 1;									// Size of the gate mesh from the midpoint, * 2 for the full size, plus 1 to make sure it goes into the ground with no clipping
+	UE_LOG(LogTemp, Warning, TEXT("Gate Z Offset = %f"), GateZOffset);
 
-	float NewGateLocationZ = FMath::Lerp(GateStartPosition.Z, GateStartPosition.Z + GateZOffset, Alpha);
+	float NewGateLocationZ = FMath::Lerp(GateStartPosition.Z, GateStartPosition.Z - GateZOffset, Alpha);
 	SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, NewGateLocationZ));
 }
 

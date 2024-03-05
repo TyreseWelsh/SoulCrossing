@@ -30,5 +30,5 @@ public:
 	void StoreSoulEnergy(int EnergyToStore);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void PossessThis();
+	void PossessThis(FRotator CameraRotation);
 };

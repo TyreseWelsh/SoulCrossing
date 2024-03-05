@@ -32,12 +32,14 @@ AMinion::AMinion()
 	bUseControllerRotationRoll = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	// Speed of rotation around Yaw
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 1200.0f, 0.0f);
 
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->GravityScale = 2.f;
-	
+
+
 	// Camera boom to pull/push camera away from character when it collides with a world object
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -50,6 +52,11 @@ AMinion::AMinion()
 	PlayerCamera->bUsePawnControlRotation = false;
 
 	PossessionRadius = CreateDefaultSubobject<USphereComponent>(TEXT("PossessionRadius"));
+	PossessionRadius->InitSphereRadius(100.f);
+	PossessionRadius->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	PossessionRadius->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	PossessionRadius->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	PossessionRadius->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Overlap);
 	PossessionRadius->SetupAttachment(RootComponent);
 }
 
@@ -131,9 +138,10 @@ void AMinion::StoreSoulEnergy_Implementation(int EnergyToStore)
 	UE_LOG(LogTemp, Error, TEXT("StoredEnergy: %i, PlayerEnergy: %i"), StoredSoulEnergy, EnergyToStore);
 }
 
-void AMinion::PossessThis_Implementation()
+void AMinion::PossessThis_Implementation(FRotator ControllerRotation)
 {
 	bCanInput = false;
+	Controller->SetControlRotation(ControllerRotation);
 	PlayAnimMontage(PossessionMontage);
 }
 

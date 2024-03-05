@@ -5,8 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Possessable.h"
-#include "../DungeonPuzzleGame/Public/Weak.h"
-#include "../DungeonPuzzleGame/Public/Magic.h"
 #include "Minion.generated.h"
 
 class UInputMappingContext;
@@ -22,16 +20,11 @@ class UAnimMontage;
 class AMinionSoul;
 
 UCLASS()
-class DUNGEONPUZZLEGAME_API AMinion : public ACharacter, public IPossessable, public IWeak, public IMagic
+class DUNGEONPUZZLEGAME_API AMinion : public ACharacter, public IPossessable
 {
 	GENERATED_BODY()
 
 	// COMPONENTS
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* PlayerStaticMesh;
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* PlayerNoseMesh;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
 
@@ -99,11 +92,12 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UCameraComponent* GetCamera() { return PlayerCamera; }
 
 	// Possessable interface functions
 	int GetSoulCost_Implementation();
 	void StoreSoulEnergy_Implementation(int EnergyToStore);
-	void PossessThis_Implementation();
+	void PossessThis_Implementation(FRotator ControllerRotation);
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -118,7 +112,7 @@ public:
 	float InteractionDistance = 125.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float BaseMoveSpeed = 600.f;
+	float BaseMoveSpeed = 500.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Possession, meta = (AllowPrivateAccess = "true"))
 	bool Possessed = false;

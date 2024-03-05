@@ -6,9 +6,10 @@
 #include "../MinionSoul.h"
 #include "MinionPlayerController.h"
 #include "GameplayStateManagerComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "InputActionValue.h"
-#include "GameFramework/CharacterMovementComponent.h"
 
 #include "../Interactable.h"
 #include "Weak.h"
@@ -111,7 +112,9 @@ void UMinionStateBase::PressUnPossess()
 	if (playerSoul != nullptr)
 	{
 		playerSoul->SetSoulEnergy(PlayerReference->StoredSoulEnergy);
+		FRotator ControllerRotation = PlayerReference->GetControlRotation();			// Storing the controllers rotation at time of unpossession so that when players soul has a valid controller, we can set its rotation
 		PlayerReference->GetController()->Possess(playerSoul);
+		playerSoul->GetController()->SetControlRotation(ControllerRotation);
 	}
 }
 
